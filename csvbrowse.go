@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/zetamatta/go-mbcs"
@@ -75,9 +76,10 @@ func main1(files []string, htmlpath string) error {
 	return nil
 }
 
-const htmlpath = "tmp.html"
+const htmlname = "tmp.html"
 
 func main() {
+	htmlpath := filepath.Join(os.Getenv("TEMP"), htmlname)
 	if err := main1(os.Args[1:], htmlpath); err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 	}
