@@ -62,6 +62,11 @@ func main1(files []string, htmlpath string) error {
 	fmt.Fprintln(w, `<html>`)
 	fmt.Fprintln(w, `<head>`)
 	fmt.Fprintln(w, `<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />`)
+	fmt.Fprintln(w, `<style type="text/css">`)
+	fmt.Fprintln(w, `table{ margin-left:1cm ; border-collapse:collapse}`)
+	fmt.Fprintln(w, `table,td{ border:solid 1px gray; padding:1pt`)
+	fmt.Fprintln(w, `td{ white-space:nowrap }`)
+	fmt.Fprintln(w, `</style>`)
 	fmt.Fprintln(w, `</head>`)
 	fmt.Fprintln(w, `<body><table border>`)
 	defer func() {
