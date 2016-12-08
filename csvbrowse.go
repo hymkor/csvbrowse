@@ -31,6 +31,11 @@ func do_file(fname string, w io.Writer) error {
 		return unicode_all_err
 	}
 	csvr := csv.NewReader(strings.NewReader(unicode_all))
+
+	if strings.HasSuffix(strings.ToLower(fname), ".tsv") {
+		csvr.Comma = '\t'
+	}
+
 	for {
 		cols, err := csvr.Read()
 		if err != nil {
