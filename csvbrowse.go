@@ -73,6 +73,7 @@ func main1(files []string, htmlpath string) error {
 	fmt.Fprintln(w, `td{ white-space:nowrap }`)
 	fmt.Fprintln(w, `</style>`)
 	fmt.Fprintln(w, `</head>`)
+	fmt.Fprintf(w, "<title>%s</title>\n", strings.Join(files, ","))
 	fmt.Fprintln(w, `<body><table border>`)
 	defer func() {
 		fmt.Fprintln(w, `</table></body></html>`)
