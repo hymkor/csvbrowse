@@ -1,7 +1,7 @@
 csvbrowse
 =========
 
-On Windows, view CSV-File with the default web-browser.
+On Windows, view CSV-File with the default web-browser without daemon.
 
 ```
 [C:\] csvbrowse CSVPATH
