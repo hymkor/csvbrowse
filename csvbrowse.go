@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"html"
 	"io"
@@ -13,6 +14,8 @@ import (
 
 	"github.com/zetamatta/go-mbcs"
 )
+
+var force_tsv = flag.Bool("t",false,"Parse as tab separated value")
 
 func do_file(fname string, w io.Writer) error {
 	r, r_err := os.Open(fname)
@@ -32,7 +35,7 @@ func do_file(fname string, w io.Writer) error {
 	}
 	csvr := csv.NewReader(strings.NewReader(unicode_all))
 
-	if strings.HasSuffix(strings.ToLower(fname), ".tsv") {
+	if *force_tsv || strings.HasSuffix(strings.ToLower(fname), ".tsv") {
 		csvr.Comma = '\t'
 	}
 
@@ -90,8 +93,9 @@ func main1(files []string, htmlpath string) error {
 const htmlname = "tmp.html"
 
 func main() {
+	flag.Parse()
 	htmlpath := filepath.Join(os.Getenv("TEMP"), htmlname)
-	if err := main1(os.Args[1:], htmlpath); err != nil {
+	if err := main1(flag.Args(), htmlpath); err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 	}
 	cmd1 := exec.Cmd{
