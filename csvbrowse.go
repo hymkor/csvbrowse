@@ -15,7 +15,7 @@ import (
 	"github.com/zetamatta/go-mbcs"
 )
 
-var force_tsv = flag.Bool("t",false,"Parse as tab separated value")
+var force_tsv = flag.Bool("t", false, "Parse as tab separated value")
 
 func do_file(fname string, w io.Writer) error {
 	r, r_err := os.Open(fname)
@@ -82,9 +82,18 @@ func main1(files []string, htmlpath string) error {
 		fmt.Fprintln(w, `</table></body></html>`)
 		w.Close()
 	}()
-	for _, fname := range files {
-		if err := do_file(fname, w); err != nil {
-			return fmt.Errorf("%s: %s", fname, err.Error())
+	for _, wildcard := range files {
+		matches, matches_err := filepath.Glob(wildcard)
+		if matches_err != nil {
+			if err := do_file(wildcard, w); err != nil {
+				return fmt.Errorf("%s: %s", wildcard, err.Error())
+			}
+		} else {
+			for _, fname := range matches {
+				if err := do_file(fname, w); err != nil {
+					return fmt.Errorf("%s: %s", fname, err.Error())
+				}
+			}
 		}
 	}
 	return nil
