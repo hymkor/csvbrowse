@@ -39,6 +39,7 @@ func do_file(fname string, w io.Writer) error {
 		csvr.Comma = '\t'
 	}
 
+	tag := "th"
 	for {
 		cols, err := csvr.Read()
 		if err != nil {
@@ -56,9 +57,13 @@ func do_file(fname string, w io.Writer) error {
 	safe:
 		fmt.Fprint(w, "<tr>")
 		for i, c := range cols {
-			fmt.Fprintf(w, `<td nowrap title="%d">%s</td>`, i+1, html.EscapeString(c))
+			fmt.Fprintf(w, `<%[1]s nowrap title="%[2]d">%[3]s</%[1]s>`,
+				tag,
+				i+1,
+				html.EscapeString(c))
 		}
 		fmt.Fprintln(w, "</tr>")
+		tag = "td"
 	}
 }
 
