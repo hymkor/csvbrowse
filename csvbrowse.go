@@ -1,12 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"encoding/csv"
 	"flag"
 	"fmt"
 	"html"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -18,22 +18,33 @@ import (
 var force_tsv = flag.Bool("t", false, "Parse as tab separated value")
 
 func do_file(fname string, w io.Writer) error {
-	r, r_err := os.Open(fname)
-	if r_err != nil {
-		return r_err
-	}
-	defer r.Close()
+	pReader, pWriter := io.Pipe()
 
-	ansi_all, ansi_all_err := ioutil.ReadAll(r)
-	if ansi_all_err != nil {
-		return ansi_all_err
-	}
+	go func() {
+		r, r_err := os.Open(fname)
+		if r_err != nil {
+			pWriter.CloseWithError(r_err)
+			return
+		}
+		defer r.Close()
 
-	unicode_all, unicode_all_err := mbcs.AtoU(ansi_all)
-	if unicode_all_err != nil {
-		return unicode_all_err
-	}
-	csvr := csv.NewReader(strings.NewReader(unicode_all))
+		scnr := bufio.NewScanner(r)
+		for scnr.Scan() {
+			ansi := scnr.Bytes()
+			unicode, err := mbcs.AtoU(ansi)
+			if err != nil {
+				pWriter.CloseWithError(err)
+				return
+			}
+			if _, err2 := fmt.Fprintln(pWriter, unicode); err2 != nil {
+				pWriter.CloseWithError(err2)
+				return
+			}
+		}
+		pWriter.Close()
+	}()
+	defer pReader.Close()
+	csvr := csv.NewReader(pReader)
 
 	if *force_tsv || strings.HasSuffix(strings.ToLower(fname), ".tsv") {
 		csvr.Comma = '\t'
