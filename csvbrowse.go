@@ -17,6 +17,16 @@ import (
 
 var force_tsv = flag.Bool("t", false, "Parse as tab separated value")
 
+func isFieldCountErr(err error) bool {
+	if err == csv.ErrFieldCount {
+		return true
+	}
+	if t := err.(*csv.ParseError); t != nil && t.Err == csv.ErrFieldCount {
+		return true
+	}
+	return false
+}
+
 func do_file(fname string, w io.Writer) error {
 	pReader, pWriter := io.Pipe()
 
@@ -57,15 +67,10 @@ func do_file(fname string, w io.Writer) error {
 			if err == io.EOF {
 				return nil
 			}
-			if err == csv.ErrFieldCount {
-				goto safe
+			if !isFieldCountErr(err) {
+				return err
 			}
-			if t := err.(*csv.ParseError); t != nil && t.Err == csv.ErrFieldCount {
-				goto safe
-			}
-			return err
 		}
-	safe:
 		fmt.Fprint(w, "<tr>")
 		for i, c := range cols {
 			fmt.Fprintf(w, `<%[1]s nowrap title="%[2]d">%[3]s</%[1]s>`,
