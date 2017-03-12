@@ -124,7 +124,7 @@ const htmlname = "tmp.html"
 
 func main() {
 	flag.Parse()
-	htmlpath := filepath.Join(os.Getenv("TEMP"), htmlname)
+	htmlpath := filepath.Join(os.TempDir(), htmlname)
 	if err := main1(flag.Args(), htmlpath); err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 	}
